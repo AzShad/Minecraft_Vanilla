@@ -1,26 +1,21 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jre-alpine
 
-ARG VERSION=latest
-ARG RAM=4G
-ARG PORT=25565
+ARG MINECRAFT_VERSION=1.17.1
+ARG MEMORY_SIZE=4G
+ARG SERVER_PORT=25565
 
-ENV SERVER_VERSION=${VERSION} \
-    SERVER_RAM=${RAM} \
-    SERVER_PORT=${PORT}
+ENV MINECRAFT_VERSION=${MINECRAFT_VERSION}
+ENV MEMORY_SIZE=${MEMORY_SIZE}
+ENV SERVER_PORT=${SERVER_PORT}
 
 WORKDIR /minecraft-server
 
 RUN apk add --no-cache wget && \
-    wget -q https://launcher.mojang.com/v1/objects/$(wget -q -O- https://launchermeta.mojang.com/mc/game/version_manifest.json | jq -r '.versions[] | select(.id == env.SERVER_VERSION) | .url') -O version.json && \
-    wget -q $(cat version.json | jq -r '.downloads.server.url') -O server.jar && \
-    apk del wget && \
-    rm version.json
-
-COPY eula.txt .
-COPY server.properties .
-
-VOLUME /minecraft-server
+    wget -q https://launcher.mojang.com/v1/objects/${MINECRAFT_VERSION}/server.jar && \
+    echo "eula=true" > eula.txt
 
 EXPOSE ${SERVER_PORT}
 
-CMD java -Xms${SERVER_RAM} -Xmx${SERVER_RAM} -jar server.jar nogui
+CMD java -Xmx${MEMORY_SIZE} -Xms${MEMORY_SIZE} -jar server.jar --port ${SERVER_PORT}
+
+VOLUME ["/minecraft-server"]
