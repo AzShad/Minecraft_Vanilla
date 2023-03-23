@@ -1,7 +1,7 @@
 FROM openjdk:8-jre-alpine
 
 ENV SERVER_VERSION=1.17.1
-ENV MEMORY=2G
+ENV MEM=2G
 ENV SERVER_PORT=25565
 
 WORKDIR /minecraft
@@ -12,6 +12,6 @@ RUN apk add --no-cache curl && \
 
 VOLUME /minecraft/world
 
-CMD java -Xmx$MEMORY -jar spigot-$SERVER_VERSION.jar --port $SERVER_PORT nogui
+CMD java -Xmx$MEM -jar spigot-$SERVER_VERSION.jar --port $SERVER_PORT nogui
 
 EXPOSE $SERVER_PORT
