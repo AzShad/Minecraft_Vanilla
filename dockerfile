@@ -1,20 +1,19 @@
 FROM openjdk:8-jre-alpine
 
-ARG VERSION=1.17.1
-ARG RAM=4G
+ARG VERSION=latest
+ARG RAM=2G
 ARG PORT=25565
 
-ENV VERSION=${VERSION} \
-    RAM=${RAM} \
-    PORT=${PORT}
-
-WORKDIR /minecraft
-
-RUN wget https://launcher.mojang.com/v1/objects/${VERSION}/server.jar -O minecraft_server.jar \
-    && echo "eula=true" > eula.txt
+ENV JAVA_XMS=${RAM}
+ENV JAVA_XMX=${RAM}
 
 EXPOSE ${PORT}
 
-CMD java -Xmx${RAM} -jar minecraft_server.jar nogui
+VOLUME /data
 
-VOLUME [ "/minecraft" ]
+WORKDIR /data
+
+RUN wget https://s3.amazonaws.com/Minecraft.Download/versions/${VERSION}/minecraft_server.${VERSION}.jar \
+    && echo "eula=true" > eula.txt
+
+CMD ["java", "-jar", "minecraft_server.${VERSION}.jar", "--port", "${PORT}", "--world-dir", "/data"]
